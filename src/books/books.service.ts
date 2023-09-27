@@ -4,7 +4,7 @@ import {
     ConflictException,
   } from '@nestjs/common';
   import { PrismaService } from 'src/shared/services/prisma.service';
-  import { Book } from '@prisma/client';
+  import { Book, User } from '@prisma/client';
   
   @Injectable()
   export class BooksService {
@@ -69,6 +69,21 @@ import {
     public deleteById(id: Book['id']): Promise<Book> {
       return this.prismaService.book.delete({
         where: { id },
+      });
+    }
+
+    public async like(bookId: Book['id'], userId: User['id']): Promise<Book> {
+      return await this.prismaService.book.update({
+        where: { id: bookId },
+        data: {
+          users: {
+            create: {
+              user: {
+                connect: { id: userId },
+              },
+            },
+          },
+        },
       });
     }
   }
